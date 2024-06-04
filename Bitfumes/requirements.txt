@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+passlib
+python-jose
+PyJWT
+
+uvicorn blog.main:app --reload
+
+# hide data
+# whenevr we create the user ,we wanna hide id and password,then we create "response_model"response_model mean schemas
+# response_model that is not related to the database that mean im talking about pydentic and when we are talking about pydentic
+# we'r talking about schemas 
