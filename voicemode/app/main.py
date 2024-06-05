@@ -1,24 +1,22 @@
 from fastapi import FastAPI, HTTPException
 from gtts import gTTS
 import os
-from app.schemas import TextToSpeechRequest
 
 app = FastAPI()
 
-# Ensure the voices directory exists
-voices_dir = os.path.join(os.path.dirname(__file__), '..', 'voices')
-os.makedirs(voices_dir, exist_ok=True)
+@app.get("/tts/",tags=["Text2voice"])
+async def text_to_speech(text: str, lang: str = "en"):
+        # Check if language is supported
 
-@app.post("/convert_text_to_speech/")
-async def convert_text_to_speech(request: TextToSpeechRequest):
-    response = {}
-    for lang in request.languages:
-        try:
-            tts = gTTS(text=request.text, lang=lang)
-            filename = f"speech_{lang}.mp3"
-            filepath = os.path.join(voices_dir, filename)
-            tts.save(filepath)
-            response[lang] = filename
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-    return response
+    supported_languages =  ["en", "fr", "es", "de", "it", "pt"] 
+    if lang not in supported_languages:
+        raise HTTPException(status_code=400, detail="Unsupported language")
+
+    # Generate speech
+    tts = gTTS(text=text, lang=lang)
+    speech_folder = os.path.join(os.getcwd(), "speech", lang) 
+    os.makedirs(speech_folder, exist_ok=True)
+    speech_file = os.path.join(speech_folder, "output.mp3")
+    tts.save(speech_file)
+
+    return {"speech_path": speech_file}
